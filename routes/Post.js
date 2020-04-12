@@ -65,7 +65,33 @@ postRoutes.get(`/id`, autenticacion_1.verificarToken, (req, res) => {
         });
     }));
 });
-postRoutes.post(`/crear`, autenticacion_1.verificarToken, (req, res) => {
+postRoutes.post('/crear', autenticacion_1.verificarToken, (req, res) => {
+    let imgs;
+    if (req.body.imgs) {
+        imgs = req.body.imgs.split(',');
+    }
+    else {
+        imgs = [];
+    }
+    const post = {
+        fecha: new Date(),
+        titulo: req.body.titulo,
+        texto: req.body.texto,
+        coords: req.body.coords,
+        imgs,
+        usuario: req.usuario._id
+    };
+    Post_1.Post.create(post).then(post => {
+        res.json({
+            ok: true,
+            post
+        });
+    })
+        .catch(err => res.status(400).json({ ok: false,
+        message: 'Error al crear post',
+        err }));
+});
+postRoutes.post(`/crearTemp`, autenticacion_1.verificarToken, (req, res) => {
     const imagenes = fileSystem.imagenesDeTempHaciaPost(req.usuario._id);
     const post = {
         titulo: req.body.titulo,

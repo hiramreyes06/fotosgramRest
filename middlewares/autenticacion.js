@@ -10,9 +10,9 @@ exports.verificarToken = (req, res, next) => {
         req.usuario = decoded.usuario;
         next();
     }).catch(err => {
-        res.json({
+        res.status(400).json({
             ok: false,
-            message: 'Token no valido',
+            message: 'Autenticacion caducada',
             err
         });
     });

@@ -22,16 +22,15 @@ const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(environment_1.CLIENT_ID);
 const usuarioRoutes = express_1.Router();
 usuarioRoutes.post('/google', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userToken = req.get('x-token') || '';
+    const userToken = req.get('x-token');
     const usuarioGoogle = yield verify(userToken)
         .catch(err => {
         res.status(404).json({
             ok: false,
-            message: 'Token de google no valido',
-            err
+            message: 'Token de google no valido'
         });
     });
-    Usuario_1.Usuario.findOne({ email: usuarioGoogle.email }, (err, usuarioBD) => {
+    Usuario_1.Usuario.findOne({ email: usuarioGoogle.email }, '-password', (err, usuarioBD) => {
         if (err) {
             return res.json({
                 ok: false,
@@ -39,10 +38,10 @@ usuarioRoutes.post('/google', (req, res) => __awaiter(void 0, void 0, void 0, fu
             });
         }
         if (usuarioBD) {
-            if (!usuarioBD.google) {
+            if (usuarioBD.google === false) {
                 return res.status(401).json({
                     ok: false,
-                    message: 'Solo puedes usar la autenticacion normal'
+                    message: 'Ya estas registrado, necesitas iniciar sesion'
                 });
             }
             else {
@@ -54,6 +53,8 @@ usuarioRoutes.post('/google', (req, res) => __awaiter(void 0, void 0, void 0, fu
                 });
                 res.json({
                     ok: true,
+                    message: 'El usuario ya estaba registrado, google token valido',
+                    usuario: usuarioBD,
                     tokenUser
                 });
             }
@@ -74,9 +75,10 @@ usuarioRoutes.post('/google', (req, res) => __awaiter(void 0, void 0, void 0, fu
                     email: usuarioRegistrado.email,
                     role: usuarioRegistrado.role
                 });
+                delete usuarioRegistrado.password;
                 res.json({
                     ok: true,
-                    usuarioRegistrado,
+                    usuario: usuarioRegistrado,
                     tokenUser
                 });
             }).catch(err => {
@@ -103,7 +105,7 @@ usuarioRoutes.get('/pagina', autenticacion_1.verificarToken, (req, res) => __awa
     const pagina = Number(req.query.pagina) || 1;
     let skip = pagina - 1;
     skip *= 10;
-    yield Usuario_1.Usuario.find()
+    yield Usuario_1.Usuario.find({}, '-password')
         .limit(10)
         .sort({ _id: -1 })
         .skip(skip)
@@ -120,9 +122,9 @@ usuarioRoutes.get('/pagina', autenticacion_1.verificarToken, (req, res) => __awa
         });
     });
 }));
-usuarioRoutes.get('/:termino', [autenticacion_1.verificarToken, autenticacion_1.adminRole], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const termino = new RegExp(req.params.termino, 'i');
-    yield Usuario_1.Usuario.find({ nombre: termino })
+usuarioRoutes.get('/termino', [autenticacion_1.verificarToken, autenticacion_1.adminRole], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const termino = new RegExp(req.query.termino, 'i');
+    yield Usuario_1.Usuario.find({ nombre: termino }, '-password')
         .limit(10)
         .exec((err, usuarios) => {
         if (err)
@@ -139,11 +141,11 @@ usuarioRoutes.get('/:termino', [autenticacion_1.verificarToken, autenticacion_1.
         });
     });
 }));
-usuarioRoutes.get('/nmUsuarios', (req, res) => {
-    Usuario_1.Usuario.countDocuments((err, nmUsuarios) => {
+usuarioRoutes.get('/nmUsuarios', autenticacion_1.verificarToken, (req, res) => {
+    Usuario_1.Usuario.countDocuments({}, (err, nmUsuarios) => {
         if (err)
             throw err;
-        res.json({
+        return res.json({
             ok: true,
             nmUsuarios
         });
@@ -155,7 +157,7 @@ usuarioRoutes.post(`/login`, (req, res) => {
         if (err)
             throw new err;
         if (!usuarioBD) {
-            return res.json({
+            return res.status(400).json({
                 ok: false,
                 message: 'Usuario/contraseña no encontrada'
             });
@@ -169,12 +171,19 @@ usuarioRoutes.post(`/login`, (req, res) => {
             });
             res.json({
                 ok: true,
-                usuario: usuarioBD,
+                usuario: {
+                    avatar: usuarioBD.avatar,
+                    role: usuarioBD.role,
+                    google: usuarioBD.google,
+                    _id: usuarioBD._id,
+                    nombre: usuarioBD.nombre,
+                    email: usuarioBD.email
+                },
                 token
             });
         }
         else {
-            res.json({
+            res.status(400).json({
                 ok: false,
                 message: 'usuario/Contraseña no son correctos'
             });
@@ -212,12 +221,13 @@ usuarioRoutes.put(`/actualizar`, autenticacion_1.verificarToken, (req, res) => {
 usuarioRoutes.post(`/crear`, (req, res) => {
     const usuario = {
         nombre: req.body.nombre,
-        avatar: req.body.avatar,
+        avatar: req.body.avatar || 'sinFoto',
         email: req.body.email,
         role: req.body.role,
         password: bcryptjs_1.default.hashSync(req.body.password, 10)
     };
     Usuario_1.Usuario.create(usuario).then(usuarioRegistrado => {
+        delete usuarioRegistrado['password'];
         res.json({
             ok: true,
             usuarioRegistrado

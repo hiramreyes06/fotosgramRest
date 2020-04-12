@@ -33,7 +33,7 @@ mongoose_1.default.connect(process.env.URLDB, { useNewUrlParser: true,
     useUnifiedTopology: true }, (err) => {
     if (err)
         throw err;
-    console.log("\x1b[42m", 'Base de datos online');
+    console.log('Base de datos online');
 });
 prueba.get(`/`, (req, res) => {
     res.json({
@@ -43,5 +43,5 @@ prueba.get(`/`, (req, res) => {
 });
 server.app.use(prueba);
 server.start(() => {
-    console.log("\x1b[42m", `Escuchando el puerto: ${environment_1.SERVER_PORT}`);
+    console.log(`Escuchando el puerto: ${environment_1.SERVER_PORT}`);
 });

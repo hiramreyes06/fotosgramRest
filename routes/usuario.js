@@ -122,7 +122,7 @@ usuarioRoutes.get('/pagina', autenticacion_1.verificarToken, (req, res) => __awa
         });
     });
 }));
-usuarioRoutes.get('/termino', [autenticacion_1.verificarToken, autenticacion_1.adminRole], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+usuarioRoutes.get('/termino', autenticacion_1.verificarToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const termino = new RegExp(req.query.termino, 'i');
     yield Usuario_1.Usuario.find({ nombre: termino }, '-password')
         .limit(10)
@@ -221,7 +221,7 @@ usuarioRoutes.put(`/actualizar`, autenticacion_1.verificarToken, (req, res) => {
 usuarioRoutes.post(`/crear`, (req, res) => {
     const usuario = {
         nombre: req.body.nombre,
-        avatar: req.body.avatar || 'sinFoto',
+        avatar: req.body.avatar || 'https://res.cloudinary.com/hiramreyes06/image/upload/v1586800939/fotosGram/kwg2dkdgmht0gkjd63wf.jpg',
         email: req.body.email,
         role: req.body.role,
         password: bcryptjs_1.default.hashSync(req.body.password, 10)
@@ -233,7 +233,7 @@ usuarioRoutes.post(`/crear`, (req, res) => {
             usuarioRegistrado
         });
     }).catch(err => {
-        res.json({
+        res.status(400).json({
             ok: false,
             message: 'No se pudo registrar al usuario',
             err

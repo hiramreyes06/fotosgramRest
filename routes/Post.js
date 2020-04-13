@@ -33,12 +33,14 @@ postRoutes.get(`/pagina`, (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (!posts) {
             return res.json({
                 ok: false,
-                message: 'No existen posts'
+                message: 'No existen posts',
+                posts: []
             });
         }
         res.json({
             ok: true,
-            posts
+            posts,
+            pagina
         });
     });
 }));

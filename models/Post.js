@@ -1,6 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const multimedia = new mongoose_1.Schema({
+    tipo: {
+        type: String
+    },
+    url: {
+        type: String
+    },
+    _id: { id: false }
+});
 const postSchema = new mongoose_1.Schema({
     fecha: {
         type: Date
@@ -15,9 +24,7 @@ const postSchema = new mongoose_1.Schema({
     coords: {
         type: String
     },
-    imgs: [{
-            type: String
-        }],
+    multimedia: [multimedia],
     usuario: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Usuario',

@@ -27,7 +27,8 @@ usuarioRoutes.post('/google', (req, res) => __awaiter(void 0, void 0, void 0, fu
         .catch(err => {
         res.status(404).json({
             ok: false,
-            message: 'Token de google no valido'
+            message: 'Token de google no valido',
+            err
         });
     });
     Usuario_1.Usuario.findOne({ email: usuarioGoogle.email }, '-password', (err, usuarioBD) => {
@@ -120,6 +121,37 @@ usuarioRoutes.get('/pagina', autenticacion_1.verificarToken, (req, res) => __awa
             ok: true,
             usuarios
         });
+    });
+}));
+usuarioRoutes.get('/existente', autenticacion_1.verificarToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const nombreU = new RegExp(req.query.nombre, 'i');
+    yield Usuario_1.Usuario.findOne({ nombre: nombreU })
+        .exec((err, usuario) => {
+        if (err) {
+            return res.status(404).json({
+                ok: false,
+                err
+            });
+        }
+        else if (!usuario) {
+            return res.json({
+                existe: false,
+                message: 'El nombre ' + nombreU + ' esta disponible'
+            });
+        }
+        if (req.query.nombre.toLowerCase() ===
+            usuario.nombre.toLowerCase()) {
+            res.json({
+                existe: true,
+                message: 'El nombre ' + nombreU + ' ya fue usado'
+            });
+        }
+        else {
+            res.json({
+                existe: false,
+                message: 'El nombre ' + nombreU + ' esta disponible'
+            });
+        }
     });
 }));
 usuarioRoutes.get('/termino', autenticacion_1.verificarToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -68,19 +68,19 @@ postRoutes.get(`/id`, autenticacion_1.verificarToken, (req, res) => {
     }));
 });
 postRoutes.post('/crear', autenticacion_1.verificarToken, (req, res) => {
-    let imgs;
-    if (req.body.imgs) {
-        imgs = req.body.imgs.split(',');
+    let multimedia;
+    if (req.body.multimedia) {
+        multimedia = JSON.parse(req.body.multimedia);
     }
     else {
-        imgs = [];
+        multimedia = [];
     }
     const post = {
         fecha: new Date(),
         titulo: req.body.titulo,
         texto: req.body.texto,
         coords: req.body.coords,
-        imgs,
+        multimedia,
         usuario: req.usuario._id
     };
     Post_1.Post.create(post).then(post => {

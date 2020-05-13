@@ -123,7 +123,7 @@ usuarioRoutes.get('/pagina', autenticacion_1.verificarToken, (req, res) => __awa
         });
     });
 }));
-usuarioRoutes.get('/existente', autenticacion_1.verificarToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+usuarioRoutes.get('/existente', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const nombreU = new RegExp(req.query.nombre, 'i');
     yield Usuario_1.Usuario.findOne({ nombre: nombreU })
         .exec((err, usuario) => {
@@ -275,7 +275,8 @@ usuarioRoutes.post(`/crear`, (req, res) => {
 usuarioRoutes.get(`/token`, autenticacion_1.verificarToken, (req, res) => {
     res.json({
         ok: true,
-        token: req.usuario
+        token: req.usuario,
+        crudo: req.get('x-token')
     });
 });
 exports.default = usuarioRoutes;

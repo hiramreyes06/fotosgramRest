@@ -10,6 +10,7 @@ const express_1 = require("express");
 const usuario_1 = __importDefault(require("./routes/usuario"));
 const Post_1 = __importDefault(require("./routes/Post"));
 const mensajes_1 = __importDefault(require("./routes/mensajes"));
+const mapa_1 = __importDefault(require("./routes/mapa"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
@@ -29,6 +30,7 @@ server.app.use(express_fileupload_1.default({
 server.app.use(`/usuario`, usuario_1.default);
 server.app.use(`/post`, Post_1.default);
 server.app.use('/mensajes', mensajes_1.default);
+server.app.use('/mapa', mapa_1.default);
 mongoose_1.default.connect(process.env.URLDB, { useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true,

@@ -32,6 +32,7 @@ class Server {
             socket.conectarCliente(cliente, this.io);
             socket.configurarUsuario(cliente, this.io);
             socket.obtenerUsuarios(cliente, this.io);
+            socket.mapaSockets(cliente, this.io);
             socket.mensaje(cliente, this.io);
             socket.post(cliente, this.io);
             socket.desconectar(cliente, this.io);

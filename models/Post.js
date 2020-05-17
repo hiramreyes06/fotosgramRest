@@ -22,7 +22,12 @@ const postSchema = new mongoose_1.Schema({
         type: String,
     },
     coords: {
-        type: String
+        lng: {
+            type: Number
+        },
+        lat: {
+            type: Number
+        }
     },
     multimedia: [multimedia],
     usuario: {

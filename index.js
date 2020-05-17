@@ -22,7 +22,7 @@ const corsOptions = {
     origin: true
 };
 server.app.use(cors_1.default(corsOptions));
-server.app.use(body_parser_1.default.urlencoded({ extended: true }));
+server.app.use(body_parser_1.default.urlencoded({ extended: false }));
 server.app.use(body_parser_1.default.json());
 server.app.use(express_fileupload_1.default({
     useTempFiles: true

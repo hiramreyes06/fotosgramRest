@@ -18,6 +18,21 @@ const Post_1 = require("../models/Post");
 const file_system_1 = __importDefault(require("../clases/file-system"));
 const fileSystem = new file_system_1.default();
 const postRoutes = express_1.Router();
+postRoutes.get('/busqueda', (req, res) => {
+    const titulo = new RegExp(req.query.titulo, 'i');
+    Post_1.Post.findOne({ titulo: titulo }).populate('usuario', '-password')
+        .exec().then(post => {
+        if (!post) {
+            res.status(404).json({
+                existe: false,
+                message: 'El post no fue encontrado'
+            });
+        }
+        else {
+            res.json(post);
+        }
+    }).catch(err => res.status(400).json(err));
+});
 postRoutes.get(`/pagina`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var pagina = Number(req.query.pagina) || 1;
     let skip = pagina - 1;
@@ -49,7 +64,7 @@ postRoutes.get(`/imagen/:userid/:img`, autenticacion_1.verificarToken, (req, res
     const img = req.params.img;
     res.sendFile(fileSystem.getFotoUrl(userId, img));
 });
-postRoutes.get(`/:id`, autenticacion_1.verificarToken, (req, res) => {
+postRoutes.get(`/:id`, (req, res) => {
     const id = req.params.id;
     Post_1.Post.findById(id, (err, post) => __awaiter(void 0, void 0, void 0, function* () {
         if (err)
@@ -76,7 +91,10 @@ postRoutes.post('/crear', autenticacion_1.verificarToken, (req, res) => {
         fecha: new Date(),
         titulo: req.body.titulo,
         texto: req.body.texto,
-        coords: req.body.coords,
+        coords: {
+            lng: req.body.coords.lng,
+            lat: req.body.coords.lat
+        },
         multimedia,
         usuario: req.usuario._id
     };
